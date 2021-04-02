@@ -1,29 +1,39 @@
+import argparse
+import sys
+
 from bluesky_widgets.models.search import Search
 from bluesky_widgets.qt import gui_qt
 
 from .app import DemoApp
 
-def main(argv):
+def main(argv=None):
     print(__doc__)
+
+    parser = argparse.ArgumentParser(
+        description="bluesky-widgets demo"
+    )
+    parser.add_argument('--zmq', help="0MQ address")
+    parser.add_argument('--catalog', help="Databroker catalog")
+    args = parser.parse_args(argv)
 
     with gui_qt("Demo App"):
         app = DemoApp()
 
         # Optional: Receive live streaming data.
-        if len(argv) > 1:
+        if args.zmq:
             from bluesky_widgets.qt.zmq_dispatcher import RemoteDispatcher
             from bluesky_widgets.utils.streaming import (
                 stream_documents_into_runs,
             )
 
-            address = argv[1]
+            address = args.zmq
             dispatcher = RemoteDispatcher(address)
             dispatcher.subscribe(stream_documents_into_runs(app.viewer.add_run))
             dispatcher.start()
 
-        if len(argv) > 2:
+        if args.catalog:
             import databroker
-            catalog = databroker.catalog[argv[2]]
+            catalog = databroker.catalog[args.catalog]
 
             headings = (
                 "Unique ID",
@@ -68,6 +78,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    import sys
-
-    main(sys.argv)
+    main()
