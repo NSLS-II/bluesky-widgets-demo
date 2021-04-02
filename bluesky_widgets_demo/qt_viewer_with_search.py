@@ -50,7 +50,10 @@ class QtSearchListWithButton(QWidget):
 
         go_button = QPushButton("View Selected Runs")
         layout.addWidget(go_button)
-        go_button.clicked.connect(self.model.events.view)
+        go_button.clicked.connect(self._on_go_button_clicked)
+
+    def _on_go_button_clicked(self):
+        self.model.events.view()
 
 
 class SearchAndView:
