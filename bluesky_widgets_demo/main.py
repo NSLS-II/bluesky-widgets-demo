@@ -1,5 +1,4 @@
 import argparse
-import sys
 
 from bluesky_widgets.models.search import Search
 from bluesky_widgets.qt import gui_qt
@@ -11,11 +10,9 @@ from .qt_viewer_with_search import SearchWithButton
 def main(argv=None):
     print(__doc__)
 
-    parser = argparse.ArgumentParser(
-        description="bluesky-widgets demo"
-    )
-    parser.add_argument('--zmq', help="0MQ address")
-    parser.add_argument('--catalog', help="Databroker catalog")
+    parser = argparse.ArgumentParser(description="bluesky-widgets demo")
+    parser.add_argument("--zmq", help="0MQ address")
+    parser.add_argument("--catalog", help="Databroker catalog")
     args = parser.parse_args(argv)
 
     with gui_qt("Demo App"):
@@ -33,6 +30,7 @@ def main(argv=None):
 
         if args.catalog:
             import databroker
+
             catalog = databroker.catalog[args.catalog]
 
             headings = (

@@ -30,6 +30,7 @@ class DemoApp:
         from bluesky_widgets.models.search import Search
         from bluesky_widgets.examples.utils.generate_msgpack_data import get_catalog
         from bluesky_widgets.examples.utils.add_search_mixin import columns
+
         # Initialize with a two search tabs: one with some generated example data...
         self.searches.append(Search(get_catalog(), columns=columns))
         # ...and one listing any and all catalogs discovered on the system.

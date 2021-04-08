@@ -17,16 +17,22 @@ from bluesky_widgets.models.plot_builders import Lines
 from bluesky_widgets.models.plot_specs import Figure, Axes
 from bluesky_widgets.qt.search import QtSearch
 from bluesky_widgets.qt.figures import QtFigures
-from bluesky_widgets.models.run_engine_client import RunEngineClient
 from bluesky_widgets.qt.run_engine_client import (
     QtReEnvironmentControls,
     QtReManagerConnection,
+    QtReExecutionControls,
 )
 from bluesky_widgets.utils.event import Event
-from bluesky_widgets.examples.utils.generate_msgpack_data import get_catalog
-from bluesky_widgets.examples.utils.add_search_mixin import columns
-from qtpy.QtWidgets import (QWidget, QPushButton, QHBoxLayout, QVBoxLayout,
-                            QGridLayout, QComboBox, QLabel, QTabWidget)
+from qtpy.QtWidgets import (
+    QWidget,
+    QPushButton,
+    QHBoxLayout,
+    QVBoxLayout,
+    QGridLayout,
+    QComboBox,
+    QLabel,
+    QTabWidget,
+)
 
 
 class SearchWithButton(Search):
@@ -117,9 +123,7 @@ class QtAddCustomPlot(QWidget):
         figure = Figure((axes,), title="")
         print(self.x_selector.currentText())
         print(self.y_selector.currentText())
-        line = Lines(x=self.x_selector.currentText(),
-                     ys=[self.y_selector.currentText()],
-                     axes=axes, max_runs=3)
+        line = Lines(x=self.x_selector.currentText(), ys=[self.y_selector.currentText()], axes=axes, max_runs=3)
 
         if self.model.search.active_run:
             line.add_run(self.model.search.active_run)
@@ -168,6 +172,7 @@ class QtReManager(QWidget):
         hbox = QHBoxLayout()
         hbox.addWidget(QtReManagerConnection(model))
         hbox.addWidget(QtReEnvironmentControls(model))
+        hbox.addWidget(QtReExecutionControls(model))
         hbox.addStretch()
         vbox.addLayout(hbox)
         vbox.addStretch()
@@ -190,39 +195,3 @@ class QtDemoWindow(QTabWidget):
 
         self._search_and_view = QtSearchAndView(model_sv)
         self.addTab(self._search_and_view, "Data Broker")
-
-
-# def main(argv):
-#     print(__doc__)
-#
-#     with gui_qt("Example App"):
-#         app = ExampleApp()
-#
-#         # Optional: Receive live streaming data.
-#         if len(argv) > 1:
-#             from bluesky_widgets.qt.zmq_dispatcher import RemoteDispatcher
-#             from bluesky_widgets.utils.streaming import (
-#                 stream_documents_into_runs,
-#             )
-#
-#             address = argv[1]
-#             dispatcher = RemoteDispatcher(address)
-#             dispatcher.subscribe(stream_documents_into_runs(app.viewer.add_run))
-#             dispatcher.start()
-#
-#         # We can access and modify the model as in...
-#         len(app.searches)
-#         app.searches[0]
-#         app.searches.active  # i.e. current tab
-#         app.searches.active.input.since  # time range
-#         app.searches.active.input.until
-#         app.searches.active.results
-#         app.searches.active.selection_as_catalog
-#         app.searches.active.selected_uids
-#
-#
-# if __name__ == "__main__":
-#     import sys
-#
-#     main(sys.argv)
-# >>>>>>> ENH: demo of some components for RE frontend. Formatted with black.
