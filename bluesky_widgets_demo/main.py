@@ -7,6 +7,7 @@ from bluesky_widgets.qt import gui_qt
 from .app import DemoApp
 from .qt_viewer_with_search import SearchWithButton
 
+
 def main(argv=None):
     print(__doc__)
 

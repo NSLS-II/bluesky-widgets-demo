@@ -17,11 +17,17 @@ from bluesky_widgets.models.plot_builders import Lines
 from bluesky_widgets.models.plot_specs import Figure, Axes
 from bluesky_widgets.qt.search import QtSearch
 from bluesky_widgets.qt.figures import QtFigures
+from bluesky_widgets.models.run_engine_client import RunEngineClient
+from bluesky_widgets.qt.run_engine_client import (
+    QtReEnvironmentControls,
+    QtReManagerConnection,
+)
 from bluesky_widgets.utils.event import Event
 from bluesky_widgets.examples.utils.generate_msgpack_data import get_catalog
 from bluesky_widgets.examples.utils.add_search_mixin import columns
 from qtpy.QtWidgets import (QWidget, QPushButton, QHBoxLayout, QVBoxLayout,
                             QGridLayout, QComboBox, QLabel, QTabWidget)
+
 
 class SearchWithButton(Search):
     """
@@ -152,3 +158,71 @@ class QtSearchAndView(QWidget):
         plot_layout.addWidget(QtAddCustomPlot(self.model))
         plot_layout.addWidget(QtFigures(model.viewer.figures))
         layout.addLayout(plot_layout)
+
+
+class QtReManager(QWidget):
+    def __init__(self, model, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
+        vbox = QVBoxLayout()
+        hbox = QHBoxLayout()
+        hbox.addWidget(QtReManagerConnection(model))
+        hbox.addWidget(QtReEnvironmentControls(model))
+        hbox.addStretch()
+        vbox.addLayout(hbox)
+        vbox.addStretch()
+        self.setLayout(vbox)
+
+
+class QtDemoWindow(QTabWidget):
+    def __init__(self, model_sv, model_re, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # TODO: what is the purpose of 'self.model' (if it is used for initialization,
+        #   then can it be a list of models?)
+        self.model = model_sv
+
+        self.setTabPosition(QTabWidget.West)
+
+        self._re_manager = QtReManager(model_re)
+        # TODO: putting the widget in QScrollArea doesn't work (the widget is not scaled with the window)
+        #   It can be a configuration problem.
+        self.addTab(self._re_manager, "Run Engine")
+
+        self._search_and_view = QtSearchAndView(model_sv)
+        self.addTab(self._search_and_view, "Data Broker")
+
+
+# def main(argv):
+#     print(__doc__)
+#
+#     with gui_qt("Example App"):
+#         app = ExampleApp()
+#
+#         # Optional: Receive live streaming data.
+#         if len(argv) > 1:
+#             from bluesky_widgets.qt.zmq_dispatcher import RemoteDispatcher
+#             from bluesky_widgets.utils.streaming import (
+#                 stream_documents_into_runs,
+#             )
+#
+#             address = argv[1]
+#             dispatcher = RemoteDispatcher(address)
+#             dispatcher.subscribe(stream_documents_into_runs(app.viewer.add_run))
+#             dispatcher.start()
+#
+#         # We can access and modify the model as in...
+#         len(app.searches)
+#         app.searches[0]
+#         app.searches.active  # i.e. current tab
+#         app.searches.active.input.since  # time range
+#         app.searches.active.input.until
+#         app.searches.active.results
+#         app.searches.active.selection_as_catalog
+#         app.searches.active.selected_uids
+#
+#
+# if __name__ == "__main__":
+#     import sys
+#
+#     main(sys.argv)
+# >>>>>>> ENH: demo of some components for RE frontend. Formatted with black.
