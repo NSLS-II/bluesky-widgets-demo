@@ -5,6 +5,7 @@ from bluesky_widgets.models.search import Search
 from bluesky_widgets.qt import gui_qt
 
 from .app import DemoApp
+from .qt_viewer_with_search import SearchWithButton
 
 def main(argv=None):
     print(__doc__)
@@ -17,8 +18,6 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     with gui_qt("Demo App"):
-        app = DemoApp()
-
         # Optional: Receive live streaming data.
         if args.zmq:
             from bluesky_widgets.qt.zmq_dispatcher import RemoteDispatcher
@@ -36,13 +35,12 @@ def main(argv=None):
             catalog = databroker.catalog[args.catalog]
 
             headings = (
-                "Unique ID",
                 "Scan ID",
                 "Plan Name",
                 "Scanning",
                 "Start Time",
                 "Duration",
-                "Exit Status",
+                "Unique ID",
             )
 
             def extract_results_row_from_run(run):
@@ -63,18 +61,17 @@ def main(argv=None):
                     str_duration = str(duration)
                     str_duration = str_duration[: str_duration.index(".")]
                 return (
-                    start["uid"][:8],
                     start.get("scan_id", "-"),
                     start.get("plan_name", "-"),
                     ", ".join(motors),
                     start_time.strftime("%Y-%m-%d %H:%M:%S"),
                     str_duration,
-                    "-" if stop is None else stop["exit_status"],
+                    start["uid"][:8],
                 )
 
             columns = (headings, extract_results_row_from_run)
 
-            app.model.searches.append(Search(catalog, columns=columns))
+            app = DemoApp(SearchWithButton(catalog, columns=columns))
 
 
 if __name__ == "__main__":

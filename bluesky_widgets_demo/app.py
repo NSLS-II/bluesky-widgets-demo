@@ -1,7 +1,7 @@
 from bluesky_widgets.models.auto_plot_builders import AutoLines
 from bluesky_widgets.qt import Window
 
-from .qt_viewer_with_search import SearchListWithButton, SearchAndView, QtSearchAndView
+from .qt_viewer_with_search import SearchWithButton, SearchAndView, QtSearchAndView
 
 
 class DemoApp:
@@ -16,12 +16,12 @@ class DemoApp:
     programmatic interface.
     """
 
-    def __init__(self, *, show=True, title="Demo App"):
+    def __init__(self, search, *, show=True, title="Demo App"):
         super().__init__()
         self.title = title
-        self.searches = SearchListWithButton()
+        self.search = search
         self.viewer = AutoLines(max_runs=3)
-        self.model = SearchAndView(self.searches, self.viewer)
+        self.model = SearchAndView(self.search, self.viewer)
         widget = QtSearchAndView(self.model)
         self._window = Window(widget, show=show)
 
