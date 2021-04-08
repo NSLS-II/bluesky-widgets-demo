@@ -81,8 +81,6 @@ class QtAddCustomPlot(QWidget):
         # x_selector notes:
         #   * Default to current x axis --> would mean have to find current active tab/plot_builder here?
         #   * If user changes to something else, disable add button
-        # self.x_selector.addItems(['dcm_energy', 'def'])
-        # self.y_selector.addItems(['I0', 'jkl'])
 
         self.x_selector.setEditable(True)
         self.y_selector.setEditable(True)
@@ -96,10 +94,16 @@ class QtAddCustomPlot(QWidget):
         active_search_model.events.active_run.connect(self._on_active_run_selected)
 
     def _on_active_run_selected(self, event):
-        # This is where x/y selectors would be populated
         # Could be None --> need to check
         print("_on_active_run_selected")
-        self.x_selector.addItem('a')
+        self.x_selector.clear()
+        self.y_selector.clear()
+        # FIXME? How do I get all the stream_names?
+        # Hardcoding to primary and baseline for now
+        stream_names = ["primary", "baseline"]
+        for stream in stream_names:
+            self.x_selector.addItems(self.model.search.active_run[stream].to_dask().keys())
+            self.y_selector.addItems(self.model.search.active_run[stream].to_dask().keys())
 
     def _on_new_button_clicked(self):
         print("New clicked")
@@ -108,7 +112,11 @@ class QtAddCustomPlot(QWidget):
         print(self.x_selector.currentText())
         print(self.y_selector.currentText())
         line = Lines(x=self.x_selector.currentText(),
-                     ys=[self.y_selector.currentText()], max_runs=3)
+                     ys=[self.y_selector.currentText()],
+                     axes=axes, max_runs=3)
+
+        if self.model.search.active_run:
+            line.add_run(self.model.search.active_run)
 
         self.model.viewer.plot_builders.append(line)
         self.model.viewer.figures.append(figure)
