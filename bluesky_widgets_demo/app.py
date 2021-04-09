@@ -2,7 +2,7 @@ from bluesky_widgets.models.auto_plot_builders import AutoLines
 from bluesky_widgets.models.run_engine_client import RunEngineClient
 from bluesky_widgets.qt import Window
 
-from .qt_viewer_with_search import SearchWithButton, SearchAndView, QtSearchAndView
+from .qt_viewer_with_search import SearchWithButton, QtViewer
 from .settings import SETTINGS
 
 
@@ -10,12 +10,11 @@ class ViewerModel:
     """
     This encapsulates on the models in the application.
     """
+
     def __init__(self):
-        self.title = title
-        self.search = search
+        self.search = SearchWithButton(SETTINGS.catalog, columns=SETTINGS.columns)
         self.plot_builder = AutoLines(max_runs=3)
-        self.model = SearchWithButton(SETTINGS.catalog, columns=SETTINGS.columns)
-        self.run_engine = RunEngineClient()
+        self.run_engine = RunEngineClient()  # TODO Address?
 
 
 class Viewer(ViewerModel):
@@ -26,6 +25,7 @@ class Viewer(ViewerModel):
     """
 
     def __init__(self, *, show=True, title="Demo App"):
+        # TODO Where does title thread through?
         super().__init__()
         if SETTINGS.subscribe_to:
             from bluesky_widgets.qt.zmq_dispatcher import RemoteDispatcher
@@ -35,13 +35,11 @@ class Viewer(ViewerModel):
 
             for address in SETTINGS.subscribe_to:
                 dispatcher = RemoteDispatcher(address)
-                dispatcher.subscribe(stream_documents_into_runs(app.viewer.add_run))
+                dispatcher.subscribe(stream_documents_into_runs(self.auto_plot_builder.add_run))
                 dispatcher.start()
-        widget = QtDemoWindow(self.model, self.model2)
+        widget = QtViewer(self.model)
         self._window = Window(widget, show=show)
 
-        self.model.searches.append(Search(catalog, columns=columns))
-    
     @property
     def window(self):
         return self._window

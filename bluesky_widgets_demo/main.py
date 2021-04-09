@@ -1,11 +1,9 @@
 import argparse
 
-from bluesky_widgets.models.search import Search
 from bluesky_widgets.qt import gui_qt
 
 from .app import DemoApp
 from .settings import SETTINGS
-from .qt_viewer_with_search import SearchWithButton
 
 
 def main(argv=None):
@@ -22,12 +20,10 @@ def main(argv=None):
 
             SETTINGS.catalog = databroker.catalog[args.catalog]
 
-
-
         # Optional: Receive live streaming data.
         if args.zmq:
             SETTINGS.subscribe_to.append(args.zmq)
-        app = DemoApp()
+        app = DemoApp()  # noqa: 401
 
 
 if __name__ == "__main__":

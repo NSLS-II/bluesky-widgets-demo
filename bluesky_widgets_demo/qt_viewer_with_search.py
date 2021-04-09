@@ -125,6 +125,7 @@ class QtAddCustomPlot(QWidget):
         # Loop through plot_builders and find active one
         # --> append to its ys
 
+
 class SearchAndView:
     def __init__(self, search, auto_plot_builder):
         self.search = search
@@ -134,7 +135,6 @@ class SearchAndView:
     def _on_view(self, event):
         for uid, run in self.search.active.selection_as_catalog.items():
             self.auto_plot_builder.add_run(run, pinned=True)
-
 
 
 class QtSearchAndView(QWidget):
@@ -165,7 +165,7 @@ class QtRunEngineManager(QWidget):
         self.setLayout(vbox)
 
 
-class QtViewer(QTabWidget) 
+class QtViewer(QTabWidget):
     def __init__(self, model, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.model = model
