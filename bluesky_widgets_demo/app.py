@@ -3,40 +3,48 @@ from bluesky_widgets.models.run_engine_client import RunEngineClient
 from bluesky_widgets.qt import Window
 
 from .qt_viewer_with_search import SearchWithButton, SearchAndView, QtSearchAndView
+from .settings import SETTINGS
 
 
-class DemoApp:
+class ViewerModel:
     """
-    A user-facing model composed with a Qt widget and window.
-
-    A key point here is that the model `searches` is public and can be
-    manipuated from a console, but the view `_window` and all Qt-related
-    components are private. The public `show()` and `close()` methods are the
-    only view-specific actions that are exposed to the user. Thus, this could
-    be implemented in another UI framework with no change to the user-facing
-    programmatic interface.
+    This encapsulates on the models in the application.
     """
-
-    def __init__(self, search, *, show=True, title="Demo App"):
-        super().__init__()
+    def __init__(self):
         self.title = title
         self.search = search
-        self.viewer = AutoLines(max_runs=3)
-        self.model = SearchAndView(self.search, self.viewer)
-        self.model2 = RunEngineClient()
+        self.plot_builder = AutoLines(max_runs=3)
+        self.model = SearchWithButton(SETTINGS.catalog, columns=SETTINGS.columns)
+        self.run_engine = RunEngineClient()
+
+
+class Viewer(ViewerModel):
+    """
+    This extends the model by attaching a Qt Window as its view.
+
+    This object is meant to be exposed to the user in an interactive console.
+    """
+
+    def __init__(self, *, show=True, title="Demo App"):
+        super().__init__()
+        if SETTINGS.subscribe_to:
+            from bluesky_widgets.qt.zmq_dispatcher import RemoteDispatcher
+            from bluesky_widgets.utils.streaming import (
+                stream_documents_into_runs,
+            )
+
+            for address in SETTINGS.subscribe_to:
+                dispatcher = RemoteDispatcher(address)
+                dispatcher.subscribe(stream_documents_into_runs(app.viewer.add_run))
+                dispatcher.start()
         widget = QtDemoWindow(self.model, self.model2)
         self._window = Window(widget, show=show)
 
-        from bluesky_widgets.models.search import Search
-        from bluesky_widgets.examples.utils.generate_msgpack_data import get_catalog
-        from bluesky_widgets.examples.utils.add_search_mixin import columns
-
-        # Initialize with a two search tabs: one with some generated example data...
-        self.searches.append(Search(get_catalog(), columns=columns))
-        # ...and one listing any and all catalogs discovered on the system.
-        from databroker import catalog
-
         self.model.searches.append(Search(catalog, columns=columns))
+    
+    @property
+    def window(self):
+        return self._window
 
     def show(self):
         """Resize, show, and raise the window."""

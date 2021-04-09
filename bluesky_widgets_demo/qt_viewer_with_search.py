@@ -1,17 +1,3 @@
-"""
-Search for runs and visualize their data.
-
-This example can be run alone as
-
-$ python -m bluesky_widgets_demo.qt_viewer_with_search
-
-or with the data streaming utility which will print an address to connect to
-
-$ python -m bluesky_widgets.examples.utils.stream_data_zmq
-Connect a consumer to localhost:XXXXX
-
-python -m bluesky_widgets.examples.advanced.qt_viewer_with_search localhost:XXXXX
-"""
 from bluesky_widgets.models.search import Search
 from bluesky_widgets.models.plot_builders import Lines
 from bluesky_widgets.models.plot_specs import Figure, Axes
@@ -70,7 +56,7 @@ class QtSearchWithButton(QWidget):
 class QtAddCustomPlot(QWidget):
     def __init__(self, model, *args, **kwargs):
         # Can access self.model.searches to get active
-        # self.model.viewer to access AutoLines
+        # self.model.auto_plot_builder to access AutoLines
         super().__init__(*args, **kwargs)
         self.model = model
         print(type(self.model))
@@ -128,8 +114,8 @@ class QtAddCustomPlot(QWidget):
         if self.model.search.active_run:
             line.add_run(self.model.search.active_run)
 
-        self.model.viewer.plot_builders.append(line)
-        self.model.viewer.figures.append(figure)
+        self.model.auto_plot_builder.plot_builders.append(line)
+        self.model.auto_plot_builder.figures.append(figure)
 
     def _on_add_button_clicked(self):
         print("Add clicked")
@@ -139,16 +125,16 @@ class QtAddCustomPlot(QWidget):
         # Loop through plot_builders and find active one
         # --> append to its ys
 
-
 class SearchAndView:
-    def __init__(self, search, viewer):
+    def __init__(self, search, auto_plot_builder):
         self.search = search
-        self.viewer = viewer
+        self.auto_plot_builder = auto_plot_builder
         self.search.events.view.connect(self._on_view)
 
     def _on_view(self, event):
         for uid, run in self.search.active.selection_as_catalog.items():
-            self.viewer.add_run(run, pinned=True)
+            self.auto_plot_builder.add_run(run, pinned=True)
+
 
 
 class QtSearchAndView(QWidget):
@@ -160,11 +146,11 @@ class QtSearchAndView(QWidget):
         layout.addWidget(QtSearchWithButton(model.search))
         plot_layout = QVBoxLayout()
         plot_layout.addWidget(QtAddCustomPlot(self.model))
-        plot_layout.addWidget(QtFigures(model.viewer.figures))
+        plot_layout.addWidget(QtFigures(model.auto_plot_builder.figures))
         layout.addLayout(plot_layout)
 
 
-class QtReManager(QWidget):
+class QtRunEngineManager(QWidget):
     def __init__(self, model, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.model = model
@@ -179,19 +165,17 @@ class QtReManager(QWidget):
         self.setLayout(vbox)
 
 
-class QtDemoWindow(QTabWidget):
-    def __init__(self, model_sv, model_re, *args, **kwargs):
+class QtViewer(QTabWidget) 
+    def __init__(self, model, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # TODO: what is the purpose of 'self.model' (if it is used for initialization,
-        #   then can it be a list of models?)
-        self.model = model_sv
+        self.model = model
 
         self.setTabPosition(QTabWidget.West)
 
-        self._re_manager = QtReManager(model_re)
+        self._re_manager = QtRunEngineManager(model.run_engine)
         # TODO: putting the widget in QScrollArea doesn't work (the widget is not scaled with the window)
         #   It can be a configuration problem.
         self.addTab(self._re_manager, "Run Engine")
 
-        self._search_and_view = QtSearchAndView(model_sv)
+        self._search_and_view = QtSearchAndView(SearchAndView(model.search, model.auto_plot_builder))
         self.addTab(self._search_and_view, "Data Broker")
