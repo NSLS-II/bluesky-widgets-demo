@@ -47,7 +47,7 @@ setup(
     packages=find_packages(exclude=["docs", "tests"]),
     entry_points={
         "console_scripts": [
-            'bluesky-widgets-demo = bluesky_widgets_demo.main:main'
+            "bluesky-widgets-demo = bluesky_widgets_demo.main:main"
             # 'command = some.module:some_function',
         ],
     },
