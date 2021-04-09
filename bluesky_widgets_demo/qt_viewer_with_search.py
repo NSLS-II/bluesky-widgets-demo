@@ -17,11 +17,23 @@ from bluesky_widgets.models.plot_builders import Lines
 from bluesky_widgets.models.plot_specs import Figure, Axes
 from bluesky_widgets.qt.search import QtSearch
 from bluesky_widgets.qt.figures import QtFigures
+from bluesky_widgets.qt.run_engine_client import (
+    QtReEnvironmentControls,
+    QtReManagerConnection,
+    QtReExecutionControls,
+)
 from bluesky_widgets.utils.event import Event
-from bluesky_widgets.examples.utils.generate_msgpack_data import get_catalog
-from bluesky_widgets.examples.utils.add_search_mixin import columns
-from qtpy.QtWidgets import (QWidget, QPushButton, QHBoxLayout, QVBoxLayout,
-                            QGridLayout, QComboBox, QLabel, QTabWidget)
+from qtpy.QtWidgets import (
+    QWidget,
+    QPushButton,
+    QHBoxLayout,
+    QVBoxLayout,
+    QGridLayout,
+    QComboBox,
+    QLabel,
+    QTabWidget,
+)
+
 
 class SearchWithButton(Search):
     """
@@ -111,9 +123,7 @@ class QtAddCustomPlot(QWidget):
         figure = Figure((axes,), title="")
         print(self.x_selector.currentText())
         print(self.y_selector.currentText())
-        line = Lines(x=self.x_selector.currentText(),
-                     ys=[self.y_selector.currentText()],
-                     axes=axes, max_runs=3)
+        line = Lines(x=self.x_selector.currentText(), ys=[self.y_selector.currentText()], axes=axes, max_runs=3)
 
         if self.model.search.active_run:
             line.add_run(self.model.search.active_run)
@@ -152,3 +162,36 @@ class QtSearchAndView(QWidget):
         plot_layout.addWidget(QtAddCustomPlot(self.model))
         plot_layout.addWidget(QtFigures(model.viewer.figures))
         layout.addLayout(plot_layout)
+
+
+class QtReManager(QWidget):
+    def __init__(self, model, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model = model
+        vbox = QVBoxLayout()
+        hbox = QHBoxLayout()
+        hbox.addWidget(QtReManagerConnection(model))
+        hbox.addWidget(QtReEnvironmentControls(model))
+        hbox.addWidget(QtReExecutionControls(model))
+        hbox.addStretch()
+        vbox.addLayout(hbox)
+        vbox.addStretch()
+        self.setLayout(vbox)
+
+
+class QtDemoWindow(QTabWidget):
+    def __init__(self, model_sv, model_re, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # TODO: what is the purpose of 'self.model' (if it is used for initialization,
+        #   then can it be a list of models?)
+        self.model = model_sv
+
+        self.setTabPosition(QTabWidget.West)
+
+        self._re_manager = QtReManager(model_re)
+        # TODO: putting the widget in QScrollArea doesn't work (the widget is not scaled with the window)
+        #   It can be a configuration problem.
+        self.addTab(self._re_manager, "Run Engine")
+
+        self._search_and_view = QtSearchAndView(model_sv)
+        self.addTab(self._search_and_view, "Data Broker")
