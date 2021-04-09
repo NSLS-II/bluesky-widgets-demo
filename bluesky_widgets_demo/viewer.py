@@ -2,7 +2,8 @@ from bluesky_widgets.models.auto_plot_builders import AutoLines
 from bluesky_widgets.models.run_engine_client import RunEngineClient
 from bluesky_widgets.qt import Window
 
-from .qt_viewer_with_search import SearchWithButton, QtViewer
+from .widgets import QtViewer
+from .models import SearchWithButton
 from .settings import SETTINGS
 
 

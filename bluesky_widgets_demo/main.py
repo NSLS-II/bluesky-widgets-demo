@@ -2,7 +2,7 @@ import argparse
 
 from bluesky_widgets.qt import gui_qt
 
-from .app import Viewer
+from .viewer import Viewer
 from .settings import SETTINGS
 
 

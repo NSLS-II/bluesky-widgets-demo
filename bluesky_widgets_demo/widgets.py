@@ -1,4 +1,6 @@
-from bluesky_widgets.models.search import Search
+"""
+Extendeding and supplementing the widgets import bluesky-widgets
+"""
 from bluesky_widgets.models.plot_builders import Lines
 from bluesky_widgets.models.plot_specs import Figure, Axes
 from bluesky_widgets.qt.search import QtSearch
@@ -8,7 +10,6 @@ from bluesky_widgets.qt.run_engine_client import (
     QtReManagerConnection,
     QtReExecutionControls,
 )
-from bluesky_widgets.utils.event import Event
 from qtpy.QtWidgets import (
     QWidget,
     QPushButton,
@@ -20,15 +21,7 @@ from qtpy.QtWidgets import (
     QTabWidget,
 )
 
-
-class SearchWithButton(Search):
-    """
-    A Search model with a method to handle a click event.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.events.add(view=Event)
+from .models import SearchAndView
 
 
 class QtSearchWithButton(QWidget):
@@ -124,17 +117,6 @@ class QtAddCustomPlot(QWidget):
 
         # Loop through plot_builders and find active one
         # --> append to its ys
-
-
-class SearchAndView:
-    def __init__(self, search, auto_plot_builder):
-        self.search = search
-        self.auto_plot_builder = auto_plot_builder
-        self.search.events.view.connect(self._on_view)
-
-    def _on_view(self, event):
-        for uid, run in self.search.selection_as_catalog.items():
-            self.auto_plot_builder.add_run(run, pinned=True)
 
 
 class QtSearchAndView(QWidget):
