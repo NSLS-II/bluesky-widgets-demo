@@ -9,13 +9,22 @@ from .settings import SETTINGS
 
 class ViewerModel:
     """
-    This encapsulates on the models in the application.
+    This encapsulates all the models in the application.
     """
 
-    def __init__(self):
+    def __init__(self, title="Demo App"):
+        # TODO We can remove SETTINGS here and make this cleaner once all of
+        # the relevant parameters are runtime-settable, as in
+        # self.search.catalog = ...
+        # and
+        # self.search.columns = ...
+        # Once that is possible, the argparser and other entrypoints can instantiate
+        # the app and then configure the instance without the potentially-confusing
+        # SETTINGS side-band.
+        self.title = title
         self.search = SearchWithButton(SETTINGS.catalog, columns=SETTINGS.columns)
         self.auto_plot_builder = AutoLines(max_runs=3)
-        self.run_engine = RunEngineClient()  # TODO Address?
+        self.run_engine = RunEngineClient(SETTINGS.run_engine_worker_address)
 
 
 class Viewer(ViewerModel):
@@ -26,8 +35,7 @@ class Viewer(ViewerModel):
     """
 
     def __init__(self, *, show=True, title="Demo App"):
-        # TODO Where does title thread through?
-        super().__init__()
+        super().__init__(title=title)
         if SETTINGS.subscribe_to:
             from bluesky_widgets.qt.zmq_dispatcher import RemoteDispatcher
             from bluesky_widgets.utils.streaming import (

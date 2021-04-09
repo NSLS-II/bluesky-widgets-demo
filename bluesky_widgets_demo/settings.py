@@ -39,9 +39,17 @@ columns = (headings, extract_results_row_from_run)
 
 
 class Settings:
+    """
+    This is used by the ViewerModel at __init__ time to configure itself.
+
+    The instance below, SETTINGS, is modified by the argparser before that
+    happens. We may want to rethink exactly where and how this configuration
+    injection works.
+    """
     columns = columns
     catalog = None
     subscribe_to = []
+    run_engine_worker_address = None
 
 
 SETTINGS = Settings()
