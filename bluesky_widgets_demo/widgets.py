@@ -10,6 +10,7 @@ from bluesky_widgets.qt.run_engine_client import (
     QtReManagerConnection,
     QtReQueueControls,
     QtReExecutionControls,
+    QtReStatusMonitor,
 )
 from qtpy.QtWidgets import (
     QWidget,
@@ -143,6 +144,8 @@ class QtRunEngineManager(QWidget):
         hbox.addWidget(QtReEnvironmentControls(model))
         hbox.addWidget(QtReQueueControls(model))
         hbox.addWidget(QtReExecutionControls(model))
+        hbox.addWidget(QtReStatusMonitor(model))
+
         hbox.addStretch()
         vbox.addLayout(hbox)
         vbox.addStretch()
