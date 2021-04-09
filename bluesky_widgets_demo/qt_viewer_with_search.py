@@ -133,7 +133,7 @@ class SearchAndView:
         self.search.events.view.connect(self._on_view)
 
     def _on_view(self, event):
-        for uid, run in self.search.active.selection_as_catalog.items():
+        for uid, run in self.search.selection_as_catalog.items():
             self.auto_plot_builder.add_run(run, pinned=True)
 
 
