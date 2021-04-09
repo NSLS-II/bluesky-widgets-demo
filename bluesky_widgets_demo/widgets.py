@@ -8,6 +8,7 @@ from bluesky_widgets.qt.figures import QtFigures
 from bluesky_widgets.qt.run_engine_client import (
     QtReEnvironmentControls,
     QtReManagerConnection,
+    QtReQueueControls,
     QtReExecutionControls,
 )
 from qtpy.QtWidgets import (
@@ -140,6 +141,7 @@ class QtRunEngineManager(QWidget):
         hbox = QHBoxLayout()
         hbox.addWidget(QtReManagerConnection(model))
         hbox.addWidget(QtReEnvironmentControls(model))
+        hbox.addWidget(QtReQueueControls(model))
         hbox.addWidget(QtReExecutionControls(model))
         hbox.addStretch()
         vbox.addLayout(hbox)
