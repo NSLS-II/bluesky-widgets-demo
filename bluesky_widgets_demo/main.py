@@ -2,7 +2,7 @@ import argparse
 
 from bluesky_widgets.qt import gui_qt
 
-from .app import DemoApp
+from .app import Viewer
 from .settings import SETTINGS
 
 
@@ -23,7 +23,7 @@ def main(argv=None):
         # Optional: Receive live streaming data.
         if args.zmq:
             SETTINGS.subscribe_to.append(args.zmq)
-        app = DemoApp()  # noqa: 401
+        viewer = Viewer()  # noqa: 401
 
 
 if __name__ == "__main__":
