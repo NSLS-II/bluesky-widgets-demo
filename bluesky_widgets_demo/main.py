@@ -10,7 +10,8 @@ def main(argv=None):
     print(__doc__)
 
     parser = argparse.ArgumentParser(description="bluesky-widgets demo")
-    parser.add_argument("--zmq", help="0MQ address")
+    parser.add_argument("--document-stream", nargs="*", help="Address of streaming data source, e.g. zmq://...")
+    parser.add_argument("--run-engine-worker", help="Address of RunEngine worker, e.g. zmq://...")
     parser.add_argument("--catalog", help="Databroker catalog")
     args = parser.parse_args(argv)
 
@@ -19,10 +20,8 @@ def main(argv=None):
             import databroker
 
             SETTINGS.catalog = databroker.catalog[args.catalog]
-
-        # Optional: Receive live streaming data.
-        if args.zmq:
-            SETTINGS.subscribe_to.append(args.zmq)
+        SETTINGS.subscribe_to.extend(args.document_stream or [])
+        SETTINGS.run_engine_worker_address = args.run_engine_worker
         viewer = Viewer()  # noqa: 401
 
 

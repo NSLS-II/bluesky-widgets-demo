@@ -16,6 +16,9 @@ class SearchWithButton(Search):
 
 
 class SearchAndView:
+    """
+    A model that pushes search results into auto-plots when a signal (e.g. button click) fires
+    """
     def __init__(self, search, auto_plot_builder):
         self.search = search
         self.auto_plot_builder = auto_plot_builder
