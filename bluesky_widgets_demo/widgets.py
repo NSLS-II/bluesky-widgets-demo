@@ -12,6 +12,7 @@ from bluesky_widgets.qt.run_engine_client import (
     QtReExecutionControls,
     QtReStatusMonitor,
     QtRePlanQueue,
+    QtRePlanHistory,
 )
 from qtpy.QtWidgets import (
     QWidget,
@@ -152,7 +153,7 @@ class QtRunEngineManager(QWidget):
 
         hbox = QHBoxLayout()
         hbox.addWidget(QtRePlanQueue(model))
-        hbox.addStretch()
+        hbox.addWidget(QtRePlanHistory(model))
         vbox.addLayout(hbox)
         # vbox.addStretch()
         self.setLayout(vbox)
