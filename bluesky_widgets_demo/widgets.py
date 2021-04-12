@@ -43,7 +43,9 @@ class QtSearchWithButton(QWidget):
         go_button.clicked.connect(self._on_go_button_clicked)
 
     def _on_go_button_clicked(self):
-        self.model.events.view()
+        events = self.model.events
+        if events is not None:
+            events.view()
 
 
 class QtAddCustomPlot(QWidget):
