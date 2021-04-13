@@ -22,5 +22,8 @@ class SearchAndView:
         self.search.events.view.connect(self._on_view)
 
     def _on_view(self, event):
-        for uid, run in self.search.selection_as_catalog.items():
+        catalog = self.search.selection_as_catalog
+        if catalog is None:
+            return
+        for uid, run in catalog.items():
             self.auto_plot_builder.add_run(run, pinned=True)
