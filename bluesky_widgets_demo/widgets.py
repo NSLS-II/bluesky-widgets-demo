@@ -97,11 +97,8 @@ class QtAddCustomPlot(QWidget):
             self.y_selector.addItems(self.model.search.active_run[stream].to_dask().keys())
 
     def _on_new_button_clicked(self):
-        print("New clicked")
         axes = Axes()
         figure = Figure((axes,), title="")
-        print(self.x_selector.currentText())
-        print(self.y_selector.currentText())
         line = Lines(x=self.x_selector.currentText(), ys=[self.y_selector.currentText()], axes=axes, max_runs=3)
 
         if self.model.search.active_run:
@@ -111,12 +108,16 @@ class QtAddCustomPlot(QWidget):
         self.model.auto_plot_builder.figures.append(figure)
 
     def _on_add_button_clicked(self):
-        print("Add clicked")
+        active_index = self.model.auto_plot_builder.figures.active_index
+        active_uuid = list(self.model._figures_to_lines.keys())[active_index]
+        for line in self.model._figures_to_lines[active_uuid]:
+            line.ys.append(self.y_selector.currentText())
         # To handle new x value for current plot
         # --> New Lines instance
 
         # Loop through plot_builders and find active one
         # --> append to its ys
+        # ^ can have multiple active plot_builders
 
 
 class QtSearchAndView(QWidget):

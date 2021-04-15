@@ -21,6 +21,16 @@ class SearchAndView:
         self.auto_plot_builder = auto_plot_builder
         self.search.events.view.connect(self._on_view)
 
+        self._figures_to_lines = {}
+        self.auto_plot_builder.figures.events.added.connect(self._on_figure_added)
+
     def _on_view(self, event):
         for uid, run in self.search.selection_as_catalog.items():
             self.auto_plot_builder.add_run(run, pinned=True)
+
+    def _on_figure_added(self, event):
+        figure = event.item
+        self._figures_to_lines[figure.uuid] = []
+        for builder in self.auto_plot_builder.plot_builders:
+            if builder.axes.figure.uuid == figure.uuid:
+                self._figures_to_lines[figure.uuid].append(builder)
