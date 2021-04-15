@@ -8,7 +8,12 @@ from bluesky_widgets.qt.figures import QtFigures
 from bluesky_widgets.qt.run_engine_client import (
     QtReEnvironmentControls,
     QtReManagerConnection,
+    QtReQueueControls,
     QtReExecutionControls,
+    QtReStatusMonitor,
+    QtRePlanQueue,
+    QtRePlanHistory,
+    QtReRunningPlan,
 )
 from qtpy.QtWidgets import (
     QWidget,
@@ -142,10 +147,20 @@ class QtRunEngineManager(QWidget):
         hbox = QHBoxLayout()
         hbox.addWidget(QtReManagerConnection(model))
         hbox.addWidget(QtReEnvironmentControls(model))
+        hbox.addWidget(QtReQueueControls(model))
         hbox.addWidget(QtReExecutionControls(model))
+        hbox.addWidget(QtReStatusMonitor(model))
+
         hbox.addStretch()
         vbox.addLayout(hbox)
-        vbox.addStretch()
+
+        hbox = QHBoxLayout()
+        vbox1 = QVBoxLayout()
+        vbox1.addWidget(QtReRunningPlan(model), stretch=1)
+        vbox1.addWidget(QtRePlanQueue(model), stretch=2)
+        hbox.addLayout(vbox1)
+        hbox.addWidget(QtRePlanHistory(model))
+        vbox.addLayout(hbox)
         self.setLayout(vbox)
 
 
