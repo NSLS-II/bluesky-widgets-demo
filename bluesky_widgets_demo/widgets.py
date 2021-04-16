@@ -52,7 +52,6 @@ class QtAddCustomPlot(QWidget):
         # self.model.auto_plot_builder to access AutoLines
         super().__init__(*args, **kwargs)
         self.model = model
-        print(type(self.model))
         layout = QGridLayout()
         self.setLayout(layout)
 
@@ -83,10 +82,15 @@ class QtAddCustomPlot(QWidget):
         add_button.clicked.connect(self._on_add_button_clicked)
         active_search_model = self.model.search
         active_search_model.events.active_run.connect(self._on_active_run_selected)
+        self.model.auto_plot_builder.figures.events.active_index.connect(self._on_active_figure_changed)
+
+    def _on_active_figure_changed(self, event):
+        active_index = self.model.auto_plot_builder.figures.active_index
+        active_figure = self.model.auto_plot_builder.figures[active_index]
+        self.x_selector.setCurrentText(active_figure.axes[0].x_label)
 
     def _on_active_run_selected(self, event):
         # Could be None --> need to check
-        print("_on_active_run_selected")
         self.x_selector.clear()
         self.y_selector.clear()
         # FIXME? How do I get all the stream_names?
