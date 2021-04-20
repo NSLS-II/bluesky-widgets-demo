@@ -55,11 +55,8 @@ class QtSearchWithButton(QWidget):
 
 class QtAddCustomPlot(QWidget):
     def __init__(self, model, *args, **kwargs):
-        # Can access self.model.searches to get active
-        # self.model.auto_plot_builder to access AutoLines
         super().__init__(*args, **kwargs)
         self.model = model
-        print(type(self.model))
         layout = QGridLayout()
         self.setLayout(layout)
 
@@ -67,18 +64,15 @@ class QtAddCustomPlot(QWidget):
         self.y_selector = QComboBox(self)
 
         new_button = QPushButton("New")
-        add_button = QPushButton("Add")
+        self.add_button = QPushButton("Add")
+        self.add_button.setEnabled(False)
 
         layout.addWidget(QLabel("x axis:"), 0, 0, 1, 1)
         layout.addWidget(QLabel("y axis:"), 1, 0, 1, 1)
         layout.addWidget(self.x_selector, 0, 1, 1, 2)
         layout.addWidget(self.y_selector, 1, 1, 1, 2)
         layout.addWidget(new_button, 0, 3, 1, 1)
-        layout.addWidget(add_button, 1, 3, 1, 1)
-
-        # x_selector notes:
-        #   * Default to current x axis --> would mean have to find current active tab/plot_builder here?
-        #   * If user changes to something else, disable add button
+        layout.addWidget(self.add_button, 1, 3, 1, 1)
 
         self.x_selector.setEditable(True)
         self.y_selector.setEditable(True)
@@ -87,16 +81,16 @@ class QtAddCustomPlot(QWidget):
         self.y_selector.setCurrentIndex(-1)
 
         new_button.clicked.connect(self._on_new_button_clicked)
-        add_button.clicked.connect(self._on_add_button_clicked)
+        self.add_button.clicked.connect(self._on_add_button_clicked)
         active_search_model = self.model.search
         active_search_model.events.active_run.connect(self._on_active_run_selected)
+        self.model.auto_plot_builder.figures.events.active_index.connect(self._on_active_figure_changed)
+        self.x_selector.currentTextChanged.connect(self._on_x_selector_text_changed)
 
     def _on_active_run_selected(self, event):
-        # Could be None --> need to check
-        print("_on_active_run_selected")
         self.x_selector.clear()
         self.y_selector.clear()
-        # FIXME? How do I get all the stream_names?
+        # TODO: Is there a way to get all stream_names?
         # Hardcoding to primary and baseline for now
         stream_names = ["primary", "baseline"]
         for stream in stream_names:
@@ -104,11 +98,8 @@ class QtAddCustomPlot(QWidget):
             self.y_selector.addItems(self.model.search.active_run[stream].to_dask().keys())
 
     def _on_new_button_clicked(self):
-        print("New clicked")
         axes = Axes()
         figure = Figure((axes,), title="")
-        print(self.x_selector.currentText())
-        print(self.y_selector.currentText())
         line = Lines(x=self.x_selector.currentText(), ys=[self.y_selector.currentText()], axes=axes, max_runs=3)
 
         if self.model.search.active_run:
@@ -118,12 +109,28 @@ class QtAddCustomPlot(QWidget):
         self.model.auto_plot_builder.figures.append(figure)
 
     def _on_add_button_clicked(self):
-        print("Add clicked")
-        # To handle new x value for current plot
-        # --> New Lines instance
+        if self.model.auto_plot_builder.figures.active_index is None:
+            return
+        active_index = self.model.auto_plot_builder.figures.active_index
+        active_uuid = list(self.model._figures_to_lines.keys())[active_index]
+        for line in self.model._figures_to_lines[active_uuid]:
+            line.ys.append(self.y_selector.currentText())
 
-        # Loop through plot_builders and find active one
-        # --> append to its ys
+    def _on_active_figure_changed(self, event):
+        active_index = self.model.auto_plot_builder.figures.active_index
+        active_figure = self.model.auto_plot_builder.figures[active_index]
+        self.x_selector.setCurrentText(active_figure.axes[0].x_label)
+        self.add_button.setEnabled(True)
+
+    def _on_x_selector_text_changed(self, text):
+        if self.model.auto_plot_builder.figures.active_index is None:
+            return
+        active_index = self.model.auto_plot_builder.figures.active_index
+        active_figure = self.model.auto_plot_builder.figures[active_index]
+        if text != active_figure.axes[0].x_label:
+            self.add_button.setEnabled(False)
+        else:
+            self.add_button.setEnabled(True)
 
 
 class QtSearchAndView(QWidget):
