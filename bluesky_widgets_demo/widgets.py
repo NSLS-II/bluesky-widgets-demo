@@ -165,7 +165,7 @@ class QtRunEngineManager(QWidget):
         hbox = QHBoxLayout()
         vbox1 = QVBoxLayout()
         vbox1.addWidget(QtRePlanEditor(model), stretch=1)
-        vbox1.addWidget(QtRePlanQueue(model), stretch=2)
+        vbox1.addWidget(QtRePlanQueue(model), stretch=1)
         hbox.addLayout(vbox1)
         vbox2 = QVBoxLayout()
         vbox2.addWidget(QtReRunningPlan(model), stretch=1)
