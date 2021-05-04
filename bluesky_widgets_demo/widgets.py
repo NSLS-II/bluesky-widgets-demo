@@ -91,10 +91,7 @@ class QtAddCustomPlot(QWidget):
     def _on_active_run_selected(self, event):
         self.x_selector.clear()
         self.y_selector.clear()
-        # TODO: Is there a way to get all stream_names?
-        # Hardcoding to primary and baseline for now
-        stream_names = ["primary", "baseline"]
-        for stream in stream_names:
+        for stream in self.model.search.active_run:
             self.x_selector.addItems(self.model.search.active_run[stream].to_dask().keys())
             self.y_selector.addItems(self.model.search.active_run[stream].to_dask().keys())
 
