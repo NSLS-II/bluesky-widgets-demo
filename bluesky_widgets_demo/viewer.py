@@ -1,3 +1,5 @@
+import os
+
 from bluesky_widgets.models.auto_plot_builders import AutoLines
 from bluesky_widgets.models.run_engine_client import RunEngineClient
 from bluesky_widgets.qt import Window
@@ -15,7 +17,10 @@ class ViewerModel:
     def __init__(self):
         self.search = SearchWithButton(SETTINGS.catalog, columns=SETTINGS.columns)
         self.auto_plot_builder = AutoLines(max_runs=3)
-        self.run_engine = RunEngineClient()  # TODO Address?
+
+        self.run_engine = RunEngineClient(
+            zmq_server_address=os.environ.get("QSERVER_ZMQ_ADDRESS", None),
+        )
 
 
 class Viewer(ViewerModel):
