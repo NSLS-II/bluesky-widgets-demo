@@ -1,6 +1,6 @@
 import os
 
-from bluesky_widgets.models.auto_plot_builders import AutoLines
+from bluesky_widgets.models.auto_plot_builders import AutoLines, AutoImages
 from bluesky_widgets.models.run_engine_client import RunEngineClient
 from bluesky_widgets.qt import Window
 
@@ -16,7 +16,7 @@ class ViewerModel:
 
     def __init__(self):
         self.search = SearchWithButton(SETTINGS.catalog, columns=SETTINGS.columns)
-        self.auto_plot_builder = AutoLines(max_runs=3)
+        self.auto_plot_builders = [AutoLines(max_runs=3), AutoImages(max_runs=1)]
 
         self.run_engine = RunEngineClient(
             zmq_server_address=os.environ.get("QSERVER_ZMQ_ADDRESS", None),
@@ -41,7 +41,8 @@ class Viewer(ViewerModel):
 
             for address in SETTINGS.subscribe_to:
                 dispatcher = RemoteDispatcher(address)
-                dispatcher.subscribe(stream_documents_into_runs(self.auto_plot_builder.add_run))
+                for auto_plot_builder in self.auto_plot_builders:
+                    dispatcher.subscribe(stream_documents_into_runs(auto_plot_builder.add_run))
                 dispatcher.start()
         widget = QtViewer(self)
         self._window = Window(widget, show=show)

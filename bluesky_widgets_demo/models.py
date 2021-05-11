@@ -16,24 +16,32 @@ class SearchWithButton(Search):
 
 
 class SearchAndView:
-    def __init__(self, search, auto_plot_builder):
+    def __init__(self, search, auto_plot_builders):
         self.search = search
-        self.auto_plot_builder = auto_plot_builder
+        self.auto_plot_builders = auto_plot_builders
         self.search.events.view.connect(self._on_view)
 
         self._figures_to_lines = {}
-        self.auto_plot_builder.figures.events.added.connect(self._on_figure_added)
+        for auto_plot_builder in self.auto_plot_builders:
+            auto_plot_builder.figures.events.added.connect(self._on_figure_added)
 
     def _on_view(self, event):
         catalog = self.search.selection_as_catalog
         if catalog is None:
             return
         for uid, run in catalog.items():
-            self.auto_plot_builder.add_run(run, pinned=True)
+            for auto_plot_builder in self.auto_plot_builders:
+                print(type(auto_plot_builder))
+                try:
+                    auto_plot_builder.add_run(run, pinned=True)
+                except TypeError:
+                    auto_plot_builder.add_run(run)
 
     def _on_figure_added(self, event):
+        # TODO: take another look here
         figure = event.item
         self._figures_to_lines[figure.uuid] = []
-        for builder in self.auto_plot_builder.plot_builders:
-            if builder.axes.figure.uuid == figure.uuid:
-                self._figures_to_lines[figure.uuid].append(builder)
+        for auto_plot_builder in self.auto_plot_builders:
+            for builder in auto_plot_builder.plot_builders:
+                if builder.axes.figure.uuid == figure.uuid:
+                    self._figures_to_lines[figure.uuid].append(builder)
