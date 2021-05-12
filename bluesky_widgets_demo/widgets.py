@@ -85,7 +85,7 @@ class QtAddCustomPlot(QWidget):
         self.add_button.clicked.connect(self._on_add_button_clicked)
         active_search_model = self.model.search
         active_search_model.events.active_run.connect(self._on_active_run_selected)
-        # TODO: Think through this
+        # Keep this on Lines only for now
         self.model.auto_plot_builders[0].figures.events.active_index.connect(self._on_active_figure_changed)
         self.x_selector.currentTextChanged.connect(self._on_x_selector_text_changed)
 
@@ -95,6 +95,8 @@ class QtAddCustomPlot(QWidget):
         for stream in self.model.search.active_run:
             self.x_selector.addItems(self.model.search.active_run[stream].to_dask().keys())
             self.y_selector.addItems(self.model.search.active_run[stream].to_dask().keys())
+        self.x_selector.addItem("time")
+        self.y_selector.addItem("time")
 
     def _on_new_button_clicked(self):
         axes = Axes()
@@ -104,12 +106,12 @@ class QtAddCustomPlot(QWidget):
         if self.model.search.active_run:
             line.add_run(self.model.search.active_run)
 
-        # TODO: Think through how this will work
+        # Keep this on Lines only for now
         self.model.auto_plot_builders[0].plot_builders.append(line)
         self.model.auto_plot_builders[0].figures.append(figure)
 
     def _on_add_button_clicked(self):
-        # TODO: Think through how this will work
+        # Keep this on Lines only for now
         if self.model.auto_plot_builders[0].figures.active_index is None:
             return
         active_index = self.model.auto_plot_builders[0].figures.active_index
@@ -118,14 +120,14 @@ class QtAddCustomPlot(QWidget):
             line.ys.append(self.y_selector.currentText())
 
     def _on_active_figure_changed(self, event):
-        # TODO: Think through how this will work
+        # Keep this on Lines only for now
         active_index = self.model.auto_plot_builders[0].figures.active_index
         active_figure = self.model.auto_plot_builders[0].figures[active_index]
         self.x_selector.setCurrentText(active_figure.axes[0].x_label)
         self.add_button.setEnabled(True)
 
     def _on_x_selector_text_changed(self, text):
-        # TODO: Think through how this will work
+        # Keep this on Lines only for now
         if self.model.auto_plot_builders[0].figures.active_index is None:
             return
         active_index = self.model.auto_plot_builders[0].figures.active_index

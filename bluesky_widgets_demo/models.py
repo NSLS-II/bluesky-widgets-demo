@@ -31,7 +31,6 @@ class SearchAndView:
             return
         for uid, run in catalog.items():
             for auto_plot_builder in self.auto_plot_builders:
-                print(type(auto_plot_builder))
                 try:
                     auto_plot_builder.add_run(run, pinned=True)
                 except TypeError:
