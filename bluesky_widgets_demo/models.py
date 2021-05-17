@@ -4,6 +4,8 @@ Extending and supplementing the models from bluesky-widgets
 from bluesky_widgets.models.search import Search
 from bluesky_widgets.utils.event import Event
 
+from functools import partial
+
 
 class SearchWithButton(Search):
     """
@@ -23,7 +25,7 @@ class SearchAndView:
 
         self._figures_to_lines = {}
         for auto_plot_builder in self.auto_plot_builders:
-            auto_plot_builder.figures.events.added.connect(self._on_figure_added)
+            auto_plot_builder.figures.events.added.connect(partial(self._on_figure_added, auto_plot_builder))
 
     def _on_view(self, event):
         catalog = self.search.selection_as_catalog
@@ -36,11 +38,9 @@ class SearchAndView:
                 except TypeError:
                     auto_plot_builder.add_run(run)
 
-    def _on_figure_added(self, event):
-        # TODO: take another look here
+    def _on_figure_added(self, auto_plot_builder, event):
         figure = event.item
         self._figures_to_lines[figure.uuid] = []
-        for auto_plot_builder in self.auto_plot_builders:
-            for builder in auto_plot_builder.plot_builders:
-                if builder.axes.figure.uuid == figure.uuid:
-                    self._figures_to_lines[figure.uuid].append(builder)
+        for builder in auto_plot_builder.plot_builders:
+            if builder.axes.figure.uuid == figure.uuid:
+                self._figures_to_lines[figure.uuid].append(builder)
