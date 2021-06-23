@@ -170,8 +170,14 @@ class QtRunEngineManager(QWidget):
 
         hbox = QHBoxLayout()
         vbox1 = QVBoxLayout()
-        vbox1.addWidget(QtRePlanEditor(model), stretch=1)
-        vbox1.addWidget(QtRePlanQueue(model), stretch=1)
+
+        # Register plan editor (opening plans in the editor by double-clicking the plan in the table)
+        pe = QtRePlanEditor(model)
+        pq = QtRePlanQueue(model)
+        pq.registered_item_editors.append(pe.edit_queue_item)
+
+        vbox1.addWidget(pe, stretch=1)
+        vbox1.addWidget(pq, stretch=1)
         hbox.addLayout(vbox1)
         vbox2 = QVBoxLayout()
         vbox2.addWidget(QtReRunningPlan(model), stretch=1)
