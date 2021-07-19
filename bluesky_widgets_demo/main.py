@@ -23,6 +23,7 @@ def main(argv=None):
         # Optional: Receive live streaming data.
         if args.zmq:
             SETTINGS.subscribe_to.append(args.zmq)
+
         viewer = Viewer()  # noqa: 401
 
 
