@@ -20,6 +20,7 @@ class ViewerModel:
 
         self.run_engine = RunEngineClient(
             zmq_server_address=os.environ.get("QSERVER_ZMQ_ADDRESS", None),
+            zmq_subscribe_address=os.environ.get("QSERVER_ZMQ_CONSOLE_ADDRESS", None),
         )
 
 

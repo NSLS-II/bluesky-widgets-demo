@@ -15,6 +15,7 @@ from bluesky_widgets.qt.run_engine_client import (
     QtRePlanHistory,
     QtReRunningPlan,
     QtRePlanEditor,
+    QtReConsoleMonitor,
 )
 from qtpy.QtWidgets import (
     QWidget,
@@ -182,6 +183,7 @@ class QtRunEngineManager(QWidget):
         vbox2 = QVBoxLayout()
         vbox2.addWidget(QtReRunningPlan(model), stretch=1)
         vbox2.addWidget(QtRePlanHistory(model), stretch=2)
+        vbox2.addWidget(QtReConsoleMonitor(model), stretch=1)
         hbox.addLayout(vbox2)
         vbox.addLayout(hbox)
         self.setLayout(vbox)
