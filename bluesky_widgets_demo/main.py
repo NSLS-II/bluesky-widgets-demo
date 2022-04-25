@@ -21,14 +21,16 @@ def main(argv=None):
         "QSERVER_ZMQ_CONTROL_ADDRESS environment variable. Default address is "
         "used if the parameter or the environment variable are not specified.",
     )
-    # parser.add_argument(
-    #     "--zmq-info-addr",
-    #     default=None,
-    #     help="Address of PUB-SUB socket of RE Manager. If the address is passed as ""
-    #     "a CLI parameter, it overrides the address specified with "
-    #     "QSERVER_ZMQ_INFO_ADDRESS environment variable. Default address is "
-    #     "used if the parameter or the environment variable are not specified.",
-    # )
+    parser.add_argument(
+        "--zmq-info-addr",
+        default=None,
+        help="Address of PUB-SUB socket of RE Manager. If the address is passed as "
+        "a CLI parameter, it overrides the address specified with "
+        "QSERVER_ZMQ_INFO_ADDRESS environment variable. Default address is "
+        "used if the parameter or the environment variable are not specified.",
+    )
+
+    parser.add_argument("--zmq-doc-addr", help="0MQ address: for stream of databroker documents")
 
     parser.add_argument("--catalog", help="Databroker catalog")
     args = parser.parse_args(argv)
@@ -36,8 +38,10 @@ def main(argv=None):
     zmq_control_addr = args.zmq_control_addr
     zmq_control_addr = zmq_control_addr or os.environ.get("QSERVER_ZMQ_CONTROL_ADDRESS", None)
 
-    # zmq_info_addr = args.zmq_info_addr
-    # zmq_info_addr = zmq_info_addr or os.environ.get("QSERVER_ZMQ_INFO_ADDRESS", None)
+    zmq_info_addr = args.zmq_info_addr
+    zmq_info_addr = zmq_info_addr or os.environ.get("QSERVER_ZMQ_INFO_ADDRESS", None)
+
+    zmq_doc_addr = args.zmq_doc_addr
 
     with gui_qt("Demo App"):
         if args.catalog:
@@ -47,7 +51,10 @@ def main(argv=None):
 
         # Optional: Receive live streaming data.
         if args.zmq:
-            SETTINGS.subscribe_to.append(zmq_control_addr)
+            SETTINGS.subscribe_to.append(zmq_doc_addr)
+
+        SETTINGS.zmq_re_manager_control_addr = zmq_control_addr
+        SETTINGS.zmq_re_manager_info_addr = zmq_info_addr
 
         viewer = Viewer()  # noqa: 401
 

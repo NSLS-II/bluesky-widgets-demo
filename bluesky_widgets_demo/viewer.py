@@ -1,5 +1,3 @@
-import os
-
 from bluesky_widgets.models.auto_plot_builders import AutoLines, AutoImages
 from bluesky_widgets.models.run_engine_client import RunEngineClient
 from bluesky_widgets.qt import Window
@@ -19,8 +17,8 @@ class ViewerModel:
         self.auto_plot_builders = [AutoLines(max_runs=3), AutoImages(max_runs=1)]
 
         self.run_engine = RunEngineClient(
-            zmq_server_address=os.environ.get("QSERVER_ZMQ_ADDRESS", None),
-            zmq_subscribe_address=os.environ.get("QSERVER_ZMQ_CONSOLE_ADDRESS", None),
+            zmq_control_addr=SETTINGS.zmq_re_manager_control_addr,
+            zmq_info_addr=SETTINGS.zmq_re_manager_info_addr,
         )
 
 
